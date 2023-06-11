@@ -9,12 +9,12 @@ import {
   View,
 } from "react-native";
 import Animated, {
-  Easing,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
 import styles from "./styles";
+import Icons from "../../assets/bottomTabIcons";
 
 interface IProps {
   children: React.ReactNode;
@@ -33,60 +33,54 @@ export const AuthLayout = ({
   const secondImageOpacity = useSharedValue(0);
   const firstImageYOffset = useSharedValue(0);
   const secondImageYOffset = useSharedValue(0);
+  const imageHight = useSharedValue(0);
+
+  // const opacity = useSharedValue(450)
+  const imageOneSize = useSharedValue(100)
+  const imageTwoSize = useSharedValue(180)
+
+  const imageOneStyle = useAnimatedStyle(() => {
+    return {
+      height: imageOneSize.value,
+      width: imageOneSize.value,
+      marginBottom: 25,
+    }
+  })
+  const imageTwoStyle = useAnimatedStyle(() => {
+    return {
+      height: imageTwoSize.value,
+      width: imageTwoSize.value,
+    }
+  })
 
   useEffect(() => {
-    const keyboardWillShow = Keyboard.addListener("keyboardWillShow", () => {
-      firstImageOpacity.value = withTiming(0, {
-        duration: 2500,
-        easing: Easing.out(Easing.linear),
-      });
-      firstImageYOffset.value = withTiming(-20, {
-        duration: 2500,
-        easing: Easing.out(Easing.exp),
-      });
-      secondImageOpacity.value = withTiming(1, {
-        duration: 1200,
-        easing: Easing.out(Easing.exp),
-      });
+    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+      console.log('Keyboard Shown');
+      // console.log();
+      imageOneSize.value = withTiming(100, {
+        duration: 600,
+      })
+      imageTwoSize.value = withTiming(180, {
+        duration: 600,
+      })
     });
-    const keyboardWillHide = Keyboard.addListener("keyboardWillHide", () => {
-      firstImageOpacity.value = withTiming(1, {
-        duration: 1500,
-        easing: Easing.out(Easing.exp),
-      });
-      firstImageYOffset.value = withTiming(0, {
-        duration: 1500,
-        easing: Easing.out(Easing.exp),
-      });
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      console.log('Keyboard Hidden');
 
-      secondImageOpacity.value = withTiming(0, {
-        duration: 1000,
-        easing: Easing.out(Easing.exp),
-      });
-      secondImageYOffset.value = withTiming(
-        -20,
-        {
-          duration: 500,
-          easing: Easing.out(Easing.linear),
-        },
-        () => {
-          secondImageYOffset.value = 0;
-        }
-      );
+      imageOneSize.value = withTiming(80, {
+        duration: 600,
+      })
+      imageTwoSize.value = withTiming(250, {
+        duration: 600,
+      })
     });
 
     return () => {
-      keyboardWillShow.remove();
-      keyboardWillHide.remove();
+      showSubscription.remove();
+      hideSubscription.remove();
     };
   }, []);
 
-  const firstImageStyles = useAnimatedStyle(() => {
-    return {
-      opacity: firstImageOpacity.value,
-      transform: [{ translateY: firstImageYOffset.value }],
-    };
-  });
 
   const secondImageStyles = useAnimatedStyle(() => {
     return {
@@ -103,12 +97,19 @@ export const AuthLayout = ({
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.Container}>
-          <Animated.View style={[styles.BannerContainer, firstImageStyles]}>
+          <Animated.View style={[styles.BannerContainer,]}>
             <ImageBackground
-              source={require("../../assets/images/login.png")}
-              style={styles.BannerImage}
+              source={require("../../assets/images/back_ground.png")}
+              style={[styles.BannerImage, { alignItems: 'center' }]}
               resizeMode="stretch"
             >
+              <Animated.View
+                style={{ ...imageOneStyle, alignSelf: 'center', }}  >
+                <Icons.BrandIcon height={100} width={100} />
+              </Animated.View>
+              <Animated.Image source={require('../../assets/images/login_group.png')}
+                style={{ ...imageTwoStyle, alignSelf: 'center' }}
+              />
               <Header {...{ headerHeight }}>{headerText}</Header>
             </ImageBackground>
           </Animated.View>

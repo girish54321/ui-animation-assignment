@@ -1,18 +1,47 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   FlatList,
   Image,
   Platform,
-  ScrollView,
   Text,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
 import styles from "./styles";
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 
 export const Home = () => {
+
+  const bannerValue = useSharedValue(-160)
+  const categoryValue = useSharedValue(200)
+  const leaderBoardValue = useSharedValue(300)
+
+  const bannerStyle = useAnimatedStyle(() => {
+    return {
+      translateY: bannerValue.value,
+    }
+  })
+  const categoryValueStyle = useAnimatedStyle(() => {
+    return {
+      translateY: categoryValue.value,
+    }
+  })
+  const leaderBoardStyle = useAnimatedStyle(() => {
+    return {
+      translateY: leaderBoardValue.value,
+    }
+  })
+  useEffect(() => {
+    bannerValue.value = withSpring(0)
+    categoryValue.value = withSpring(0, {
+    })
+    leaderBoardValue.value = withSpring(0, {
+    })
+  }, [])
+
+
   return (
     <View style={styles.Container}>
       <StatusBar
@@ -20,8 +49,8 @@ export const Home = () => {
         backgroundColor="blue"
         style={Platform.OS === "android" ? "light" : "dark"}
       />
-      <View style={styles.Circle}></View>
-      <View style={styles.Header}>
+      <Animated.View style={[styles.Circle, bannerStyle]}></Animated.View>
+      <Animated.View style={[styles.Header, bannerStyle]}>
         <View style={styles.HeaderTitle}>
           <Text style={styles.HeaderText}>
             Welcome To <Text style={{ fontWeight: "bold" }}>BigHit</Text>
@@ -33,18 +62,18 @@ export const Home = () => {
             Create Profile
           </Text>
         </View>
-      </View>
-      <ScrollView
-        style={styles.Banner}
+      </Animated.View>
+      <Animated.ScrollView
+        style={[styles.Banner, bannerStyle]}
         horizontal
         showsHorizontalScrollIndicator={false}
       >
         {getArrayWithXElements(3).map((currentElement) => {
           return <BannerItem key={currentElement} />;
         })}
-      </ScrollView>
-      <ScrollView
-        style={styles.Categories}
+      </Animated.ScrollView>
+      <Animated.ScrollView
+        style={[styles.Categories, categoryValueStyle]}
         contentContainerStyle={{
           flexDirection: "row",
           alignItems: "center",
@@ -55,8 +84,8 @@ export const Home = () => {
         {getArrayWithXElements(6).map((currentElement) => {
           return <CategoryItem key={currentElement} />;
         })}
-      </ScrollView>
-      <View style={styles.Leaderboard}>
+      </Animated.ScrollView>
+      <Animated.View style={[styles.Leaderboard, leaderBoardStyle]}>
         <View style={styles.LeaderBoardTitle}>
           <FontAwesome name="star" size={18} color="orange" />
           <Text style={styles.LeaderBoardText}>
@@ -69,10 +98,10 @@ export const Home = () => {
           keyExtractor={(item) => item.toString()}
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={styles.LeaderBoardFlatlist}
+          style={[styles.LeaderBoardFlatlist]}
           contentContainerStyle={{ alignItems: "center" }}
         />
-      </View>
+      </Animated.View>
     </View>
   );
 };
